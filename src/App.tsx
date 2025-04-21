@@ -14,6 +14,8 @@ import MerchantTab from "./pages/MerchantTab";
 import AcquirerTab from "./pages/AcquirerTab";
 import Reports from "./pages/Reports";
 import CaseDetailPage from "./pages/CaseDetailPage";
+import Settings from "./pages/Settings";
+import UserProfilePage from "./pages/UserProfilePage";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +34,8 @@ const App = () => (
             <Route path="merchant" element={<MerchantTab />} />
             <Route path="acquirer" element={<AcquirerTab />} />
             <Route path="reports" element={<Reports />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="profile" element={<UserProfilePage />} />
             <Route path="case/:id" element={<CaseDetailPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />
