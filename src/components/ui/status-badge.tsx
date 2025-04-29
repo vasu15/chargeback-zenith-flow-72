@@ -27,13 +27,15 @@ const statusBadgeVariants = cva(
 export interface StatusBadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof statusBadgeVariants> {
-  status: string;
+  status?: string;
+  children?: React.ReactNode;
 }
 
 export function StatusBadge({
   className,
   variant,
   status,
+  children,
   ...props
 }: StatusBadgeProps) {
   return (
@@ -41,7 +43,7 @@ export function StatusBadge({
       className={cn(statusBadgeVariants({ variant }), className)}
       {...props}
     >
-      {status}
+      {children || status}
     </div>
   );
 }
