@@ -1,54 +1,13 @@
-
 import { useState } from "react";
-import { Settings as SettingsIcon, Save } from "lucide-react";
-import { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Settings as SettingsIcon } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { UsersList } from "@/components/settings/UsersList";
 import { AccountSecurity } from "@/components/settings/AccountSecurity";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
 
 export default function Settings() {
-  const { toast } = useToast();
-  
-  // Define state for various settings sections
-  const [generalSettings, setGeneralSettings] = useState({
-    autoProcess: true,
-    aiReview: false,
-    batchSize: "100",
-    retentionDays: "90"
-  });
-
-  const [emailSettings, setEmailSettings] = useState({
-    notifications: true,
-    reports: true,
-    alerts: true,
-    emailServer: "smtp.example.com",
-    emailPort: "587",
-    emailUser: "notifications@example.com"
-  });
-
-  const [integrationSettings, setIntegrationSettings] = useState({
-    apiEnabled: false,
-    sftp: false,
-    emailIntegration: true,
-    apiUrl: "https://api.example.com/v1",
-    apiKey: "your-api-key"
-  });
-
-  const handleSaveSettings = () => {
-    // In a real application, this would save settings to backend
-    toast({
-      title: "Settings saved",
-      description: "Your settings have been updated successfully."
-    });
-  };
-
+  // The Settings page now has user management and account security sections
   return (
     <div className="flex flex-col gap-6">
       <DashboardHeader 
