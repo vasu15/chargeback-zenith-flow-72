@@ -46,13 +46,8 @@ const mockPendingCases = Array.from({ length: 6 }).map((_, i) => ({
   date: new Date(2023, 3, 18 - i).toISOString().split("T")[0],
   reason: i % 3 === 0 ? "Fraud" : i % 3 === 1 ? "Product Not Received" : "Service Not Provided",
   dueDate: new Date(2023, 3, 28 - i).toISOString().split("T")[0],
-  proofStatus: i % 3 === 0 ? "Submitted" : i % 3 === 1 ? "Not Submitted" : "Accepted",
   details: "Customer claims they did not receive the product as described. Transaction was made online on March 15, 2023.",
   customerDetails: "John Doe, New York, Last 4 card digits: 1234",
-  proofItems: i % 3 === 0 ? [
-    { name: "Delivery Confirmation.pdf", date: "2023-04-05" },
-    { name: "Transaction Receipt.pdf", date: "2023-04-05" }
-  ] : []
 }));
 
 const mockSentCases = Array.from({ length: 4 }).map((_, i) => ({
@@ -70,7 +65,8 @@ const mockSentCases = Array.from({ length: 4 }).map((_, i) => ({
   proofItems: [
     { name: "Evidence Document.pdf", date: "2023-04-10" },
     { name: "Customer Correspondence.pdf", date: "2023-04-11" }
-  ]
+  ],
+  proofStatus: i % 3 === 0 ? "Submitted" : i % 3 === 1 ? "Not Submitted" : "Accepted",
 }));
 
 export default function MerchantTab() {
@@ -125,7 +121,7 @@ export default function MerchantTab() {
     });
     
     // In a real app, you would update the case status in your backend
-    setFilteredPending(prev => 
+    setFilteredSent(prev => 
       prev.map(item => 
         item.id === id ? { ...item, proofStatus: "Accepted" } : item
       )
@@ -220,14 +216,13 @@ export default function MerchantTab() {
                     <TableHead className="text-right">Amount</TableHead>
                     <TableHead>Reason</TableHead>
                     <TableHead>Due Date</TableHead>
-                    <TableHead>Proof Status</TableHead>
                     <TableHead className="text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredPending.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-10">
+                      <TableCell colSpan={7} className="text-center py-10">
                         No pending cases found
                       </TableCell>
                     </TableRow>
@@ -242,13 +237,106 @@ export default function MerchantTab() {
                           <TableCell>{item.reason}</TableCell>
                           <TableCell>{item.dueDate}</TableCell>
                           <TableCell>
+                            <div className="flex items-center justify-center gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                onClick={() => toggleRowExpand(item.id)}
+                              >
+                                <Eye className="mr-1 h-4 w-4" />
+                                View
+                                {expandedRows[item.id] ? (
+                                  <ChevronUp className="ml-1 h-4 w-4" />
+                                ) : (
+                                  <ChevronDown className="ml-1 h-4 w-4" />
+                                )}
+                              </Button>
+                              <Button
+                                size="sm"
+                              >
+                                Submit
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                        {expandedRows[item.id] && (
+                          <TableRow className="bg-muted/50">
+                            <TableCell colSpan={7} className="p-4">
+                              <div className="space-y-4">
+                                <div>
+                                  <h4 className="font-medium mb-1">Case Details</h4>
+                                  <p className="text-sm">{item.details}</p>
+                                </div>
+                                
+                                <div>
+                                  <h4 className="font-medium mb-1">Customer Information</h4>
+                                  <p className="text-sm">{item.customerDetails}</p>
+                                </div>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="sent" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Submitted Cases</CardTitle>
+              <CardDescription>
+                Review cases you've already responded to and track their status.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[100px]">
+                      <Button variant="ghost" className="p-0 h-8 font-medium">
+                        Case ID
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                      </Button>
+                    </TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Acquirer</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                    <TableHead>Reason</TableHead>
+                    <TableHead>Response Date</TableHead>
+                    <TableHead>Proof Status</TableHead>
+                    <TableHead className="text-center">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredSent.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center py-10">
+                        No submitted cases found
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredSent.map((item) => (
+                      <>
+                        <TableRow key={item.id} className={expandedRows[item.id] ? "bg-muted/50" : ""}>
+                          <TableCell className="font-medium">{item.id}</TableCell>
+                          <TableCell>{item.date}</TableCell>
+                          <TableCell>{item.acquirer}</TableCell>
+                          <TableCell className="text-right">${item.amount}</TableCell>
+                          <TableCell>{item.reason}</TableCell>
+                          <TableCell>{item.sentDate}</TableCell>
+                          <TableCell>
                             <StatusBadge 
                               variant={getProofStatusVariant(item.proofStatus)} 
                               status={item.proofStatus}
                             />
                           </TableCell>
                           <TableCell>
-                            <div className="flex items-center justify-center gap-2">
+                            <div className="flex items-center justify-center">
                               <Button 
                                 size="sm" 
                                 variant="outline" 
@@ -335,132 +423,7 @@ export default function MerchantTab() {
             </CardContent>
           </Card>
         </TabsContent>
-
-        <TabsContent value="sent" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Submitted Cases</CardTitle>
-              <CardDescription>
-                Review cases you've already responded to and track their status.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[100px]">
-                      <Button variant="ghost" className="p-0 h-8 font-medium">
-                        Case ID
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
-                      </Button>
-                    </TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Acquirer</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                    <TableHead>Reason</TableHead>
-                    <TableHead>Response Date</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-center">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredSent.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={8} className="text-center py-10">
-                        No submitted cases found
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredSent.map((item) => (
-                      <>
-                        <TableRow key={item.id} className={expandedRows[item.id] ? "bg-muted/50" : ""}>
-                          <TableCell className="font-medium">{item.id}</TableCell>
-                          <TableCell>{item.date}</TableCell>
-                          <TableCell>{item.acquirer}</TableCell>
-                          <TableCell className="text-right">${item.amount}</TableCell>
-                          <TableCell>{item.reason}</TableCell>
-                          <TableCell>{item.sentDate}</TableCell>
-                          <TableCell>
-                            <StatusBadge 
-                              variant={
-                                item.status === "Under Review" ? "pending" :
-                                item.status === "Pending Decision" ? "warning" : 
-                                "success"
-                              } 
-                              status={item.status}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center justify-center">
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                onClick={() => toggleRowExpand(item.id)}
-                              >
-                                <Eye className="mr-1 h-4 w-4" />
-                                View
-                                {expandedRows[item.id] ? (
-                                  <ChevronUp className="ml-1 h-4 w-4" />
-                                ) : (
-                                  <ChevronDown className="ml-1 h-4 w-4" />
-                                )}
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                        {expandedRows[item.id] && (
-                          <TableRow className="bg-muted/50">
-                            <TableCell colSpan={8} className="p-4">
-                              <div className="space-y-4">
-                                <div>
-                                  <h4 className="font-medium mb-1">Case Details</h4>
-                                  <p className="text-sm">{item.details}</p>
-                                </div>
-                                
-                                <div>
-                                  <h4 className="font-medium mb-1">Customer Information</h4>
-                                  <p className="text-sm">{item.customerDetails}</p>
-                                </div>
-                                
-                                <div>
-                                  <h4 className="font-medium mb-1">Submitted Evidence</h4>
-                                  {item.proofItems.length > 0 ? (
-                                    <ul className="text-sm space-y-1">
-                                      {item.proofItems.map((proof, idx) => (
-                                        <li key={idx} className="flex items-center gap-2">
-                                          <span>{proof.name}</span>
-                                          <span className="text-xs text-muted-foreground">
-                                            (Uploaded on {proof.date})
-                                          </span>
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  ) : (
-                                    <p className="text-sm text-muted-foreground">
-                                      No evidence was submitted.
-                                    </p>
-                                  )}
-                                </div>
-                                
-                                <div className="text-sm text-muted-foreground italic">
-                                  {item.status === "Resolved" 
-                                    ? "This case has been resolved. No further action is required."
-                                    : "Your response has been submitted. Awaiting decision from the acquirer."}
-                                </div>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   );
 }
-
