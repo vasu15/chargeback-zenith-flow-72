@@ -1,70 +1,36 @@
-
 import { useState } from "react";
-import { Save, Settings as SettingsIcon } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Settings as SettingsIcon } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { UsersList } from "@/components/settings/UsersList";
+import { AccountSecurity } from "@/components/settings/AccountSecurity";
 
 export default function Settings() {
-  const { toast } = useToast();
-  const [emailSettings, setEmailSettings] = useState({
-    notifications: true,
-    reports: true,
-    alerts: true,
-    emailServer: "smtp.company.com",
-    emailPort: "587",
-    emailUser: "chargebacks@company.com",
-  });
-
-  const [integrationSettings, setIntegrationSettings] = useState({
-    apiEnabled: true,
-    sftp: true,
-    emailIntegration: true,
-    apiUrl: "https://api.chargebacks.com/v1",
-    apiKey: "••••••••••••••••",
-  });
-
-  const [generalSettings, setGeneralSettings] = useState({
-    autoProcess: true,
-    aiReview: true,
-    batchSize: "50",
-    retentionDays: "90",
-  });
-
-  const handleSaveSettings = () => {
-    toast({
-      title: "Settings saved",
-      description: "Your settings have been updated successfully.",
-    });
-  };
-
+  // The Settings page now has user management and account security sections
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">System Settings</h1>
-        <p className="text-muted-foreground">
-          Configure system behavior and integrations.
-        </p>
-      </div>
+      <DashboardHeader 
+        title="System Settings" 
+        description="Configure system behavior, manage users, and security settings." 
+      />
 
-      <Tabs defaultValue="general" className="space-y-4">
+      <Tabs defaultValue="users" className="space-y-4">
         <TabsList>
+          <TabsTrigger value="users">Users & Permissions</TabsTrigger>
+          <TabsTrigger value="security">Account Security</TabsTrigger>
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="integrations">Integrations</TabsTrigger>
-          <TabsTrigger value="users">Users & Permissions</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="users" className="space-y-4">
+          <UsersList />
+        </TabsContent>
+
+        <TabsContent value="security" className="space-y-4">
+          <AccountSecurity />
+        </TabsContent>
 
         <TabsContent value="general" className="space-y-4">
           <Card>
@@ -343,73 +309,6 @@ export default function Settings() {
                     }
                   />
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="users" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>User Management</CardTitle>
-              <CardDescription>
-                Manage user accounts and access permissions.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border">
-                <div className="grid grid-cols-4 gap-4 p-4 font-medium">
-                  <div>User</div>
-                  <div>Role</div>
-                  <div>Last Active</div>
-                  <div>Actions</div>
-                </div>
-                {[
-                  {
-                    name: "John Doe",
-                    email: "john.doe@example.com",
-                    role: "Administrator",
-                    lastActive: "Today"
-                  },
-                  {
-                    name: "Jane Smith",
-                    email: "jane.smith@example.com",
-                    role: "Chargeback Agent",
-                    lastActive: "Yesterday"
-                  },
-                  {
-                    name: "Robert Johnson",
-                    email: "robert.j@example.com",
-                    role: "Supervisor",
-                    lastActive: "Apr 18, 2023"
-                  }
-                ].map((user, i) => (
-                  <div
-                    key={i}
-                    className="grid grid-cols-4 gap-4 border-t p-4 text-sm"
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-medium">{user.name}</span>
-                      <span className="text-muted-foreground">{user.email}</span>
-                    </div>
-                    <div className="flex items-center">{user.role}</div>
-                    <div className="flex items-center">{user.lastActive}</div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm">
-                        Edit
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        Permissions
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4 flex justify-end">
-                <Button>
-                  <SettingsIcon className="mr-2 h-4 w-4" />
-                  Add User
-                </Button>
               </div>
             </CardContent>
           </Card>
